@@ -1,6 +1,7 @@
 import google.generativeai as genai
 import json
 import os
+import random
 from datetime import datetime
 from config import GEMINI_API_KEY, SYSTEM_PROMPT, CHAT_HISTORY_FILE
 
@@ -75,7 +76,7 @@ class CNTTChatbot:
     
     def get_suggested_questions(self):
         """Trả về danh sách câu hỏi gợi ý"""
-        return [
+        questions = [
             "Tôi nên học ngôn ngữ lập trình nào trước?",
             "Lộ trình học lập trình web như thế nào?",
             "Cơ hội nghề nghiệp trong lĩnh vực AI/ML?",
@@ -83,5 +84,12 @@ class CNTTChatbot:
             "Nên chọn chuyên ngành nào trong CNTT?",
             "Kỹ năng nào quan trọng nhất cho sinh viên CNTT?",
             "Làm sao để xây dựng portfolio dự án?",
-            "Tư vấn về việc học thêm chứng chỉ IT?"
-        ]
+            "Tư vấn về việc học thêm chứng chỉ IT?",
+            "Sinh viên an toàn thông tin có việc làm không?",
+            "Làm sao để cải thiện kỹ năng giải thuật?",
+            "Back-end và Front-end khác nhau thế nào?",
+            "Hỏi Data Science thì cần gì?",
+            "DevOps làm những công việc gì?",
+            "Làm sao để luyện phỏng vấn IT?"
+        ]    
+        return random.sample(questions, 5)

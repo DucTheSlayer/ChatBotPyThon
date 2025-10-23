@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+import random
 from chatbot import CNTTChatbot
 from config import CHATBOT_NAME, CHATBOT_DESCRIPTION
 import os
