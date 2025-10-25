@@ -1,13 +1,12 @@
 import streamlit as st
 import time
-import random
 from chatbot import CNTTChatbot
 from config import CHATBOT_NAME, CHATBOT_DESCRIPTION
 import os
 
 # Cấu hình trang
 st.set_page_config(
-    page_title=CHATBOT_NAME,
+    page_title=CHATBOT_NAME,    
     page_icon="🤖",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -404,27 +403,7 @@ def main():
             <p>Hãy bắt đầu cuộc trò chuyện bằng cách nhập câu hỏi bên dưới hoặc chọn một câu hỏi gợi ý.</p>
         </div>
         """, unsafe_allow_html=True)
-    
-    # Form nhập tin nhắn với design tối
-    st.markdown("### ✍️ Gửi tin nhắn")
-    with st.form("chat_form", clear_on_submit=True):
-        user_input = st.text_area(
-            "💬 Nhập câu hỏi của bạn:",
-            placeholder="Ví dụ: Tôi nên học ngôn ngữ lập trình nào trước?",
-            height=120,
-            help="Nhập câu hỏi của bạn về học tập, nghề nghiệp, hoặc kỹ thuật lập trình"
-        )
         
-        # Chia 8 phần: 6 phần trống bên trái, 1 phần cho nút Gửi, 1 phần cho nút Xóa
-        col_space, col_submit, col_clear = st.columns([6, 1, 1])
-
-        with col_submit:
-            submitted = st.form_submit_button("Gửi", type="primary", use_container_width=True)
-        with col_clear:
-            clear_input = st.form_submit_button("Xóa", use_container_width=True)
-
-        
-    
     # Sidebar với suggested questions
     with st.sidebar:
         # Câu hỏi gợi ý với design tối
@@ -445,7 +424,23 @@ def main():
         
     
     # Xử lý tin nhắn
-    if submitted and user_input:
+    # THÊM KHỐI MỚI NÀY VÀO CUỐI HÀM MAIN()
+
+    # Xử lý input (hoặc từ chat_input hoặc từ câu hỏi gợi ý)
+    
+    # Kiểm tra xem có câu hỏi gợi ý nào được click không (set trong sidebar)
+    if hasattr(st.session_state, 'suggested_question'):
+        user_input = st.session_state.suggested_question
+        del st.session_state.suggested_question # Xóa đi để không bị lặp lại
+    else:
+        user_input = None
+        
+    # Lấy input từ st.chat_input (thanh nhập liệu ở dưới cùng)
+    if prompt := st.chat_input("Ví dụ: Tôi nên học ngôn ngữ lập trình nào trước?"):
+        user_input = prompt # Ghi đè user_input nếu người dùng gõ
+
+    # Nếu có user_input (từ 1 trong 2 nguồn)
+    if user_input:
         # Thêm tin nhắn người dùng
         st.session_state.messages.append({"role": "user", "content": user_input})
         
@@ -461,36 +456,7 @@ def main():
         # Thêm phản hồi bot
         st.session_state.messages.append({"role": "assistant", "content": response})
         
-        # Hiển thị phản hồi với animation
-        with st.chat_message("assistant"):
-            st.markdown(f"**🤖 {CHATBOT_NAME}:** {response}")
-        
-        st.rerun()
-    
-    # Xử lý câu hỏi gợi ý
-    if hasattr(st.session_state, 'suggested_question'):
-        question = st.session_state.suggested_question
-        del st.session_state.suggested_question
-        
-        # Thêm tin nhắn người dùng
-        st.session_state.messages.append({"role": "user", "content": question})
-        
-        # Hiển thị tin nhắn người dùng ngay lập tức
-        with st.chat_message("user"):
-            st.markdown(f"**👤 Bạn:** {question}")
-        
-        # Hiển thị typing indicator và loading
-        with st.chat_message("assistant"):
-            with st.spinner("🤖 Đang suy nghĩ..."):
-                response = st.session_state.chatbot.get_response(question)
-        
-        # Thêm phản hồi bot
-        st.session_state.messages.append({"role": "assistant", "content": response})
-        
-        # Hiển thị phản hồi với animation
-        with st.chat_message("assistant"):
-            st.markdown(f"**🤖 {CHATBOT_NAME}:** {response}")
-        
+        # Rerun để hiển thị tin nhắn mới của bot từ history
         st.rerun()
 
 if __name__ == "__main__":
